@@ -1,0 +1,19 @@
+services:
+  obsidian:
+    image: lscr.io/linuxserver/obsidian:latest
+    container_name: obsidian
+    security_opt:
+      - seccomp:unconfined  # Optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SSH_AUTH_SOCK=/ssh-agent
+    volumes:
+      - ./config:/config
+      - /home/premgowda/HDD/Obsidian/obsidian-notes:/obsidian-notes
+    ports:
+      - 3005:3000
+      - 3006:3001
+    shm_size: "1gb"
+    restart: unless-stopped
