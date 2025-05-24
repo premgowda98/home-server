@@ -12,7 +12,7 @@
    2. [2](https://www.youtube.com/watch?v=RpCjlyvOt18)
 5. In the setting Choose option 2 to set ip address for wan and lan
    1. For wan choose the ip address assigned by the router and also provide a gateway
-   2. For lan choose ip address like `10.10.10.1` but do not enter any gateway
+   2. For lan choose ip address like `10.10.10.1` but do not enter any gateway and enable DHCP server on lan interface
    3. Once done, attach any other VM and add network driver i.e vmbr1 with has pfsens lan
    4. Now in this VM open browser with `10.10.10.1` and pfsense web interface will open
    5. Login with default credentials:
