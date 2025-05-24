@@ -18,3 +18,5 @@
    5. Login with default credentials:
       - Username: `admin`
       - Password: `pfsense`
+6. In pfsense the default gateway should be the one which WAN uses
+7. The network traffic moves from LAN to WAN and to router and then internet
