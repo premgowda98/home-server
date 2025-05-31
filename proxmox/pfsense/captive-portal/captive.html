@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Wifi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .wifi-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .auth-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .auth-option {
+            width: 100%;
+        }
+
+        .terms-link {
+            color: #667eea;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .terms-link:hover {
+            color: #5a67d8;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #333;
+            background: #f0f0f0;
+        }
+
+        .modal-body {
+            text-align: left;
+        }
+
+        .modal-body ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modal-body li {
+            padding: 10px 0;
+            color: #555;
+            font-size: 15px;
+            display: flex;
+            align-items: flex-start;
+            line-height: 1.6;
+        }
+
+        .modal-body li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e1e5e9;
+            transition: all 0.3s ease;
+            gap: 10px; /* Add gap for spacing */
+        }
+
+        .checkbox-group.checked {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            /* user-select: none; */
+            display: flex;
+            align-items: center;
+            line-height: 1.4;
+        }
+
+        .terms-link-inline {
+            color: #667eea;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            margin-left: 4px;
+        }
+        .terms-link-inline:hover {
+            color: #5a67d8;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .footer {
+            margin-top: 25px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .success-message {
+            display: none;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .redirect-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .form-container {
+            transition: all 0.3s ease;
+        }
+
+        .form-container.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .auth-options {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .divider:before,
+        .divider:after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e1e5e9;
+        }
+
+        .divider:before {
+            margin-right: 15px;
+        }
+
+        .divider:after {
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="wifi-icon">📶</div>
+            <h1>Guest Wifi</h1>
+        </div>
+
+        <form method="POST" action="$PORTAL_ACTION$" id="loginForm">
+            <!-- Hidden pfSense fields -->
+            <input type="hidden" name="redirurl" value="$PORTAL_REDIRURL$">
+            <input type="hidden" name="zone" value="$PORTAL_ZONE$">
+
+            <div class="form-container" id="formContainer">
+                <div class="auth-options">
+                    <div class="auth-option">
+                        <div class="form-group">
+                            <label for="auth_user">Username</label>
+                            <input type="text" id="auth_user" name="auth_user" placeholder="Enter username">
+                        </div>
+                    </div>
+                    <div class="auth-option">
+                        <div class="form-group">
+                            <label for="auth_pass">Password</label>
+                            <input type="password" id="auth_pass" name="auth_pass" placeholder="Enter password">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden voucher field for pfSense compatibility -->
+                <input type="hidden" id="auth_voucher" name="auth_voucher" value="">
+
+                <div class="checkbox-group" id="checkboxGroup">
+                    <label for="agree" class="checkbox-label" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                        <input type="checkbox" id="agree" onchange="toggleSubmit()" style="margin: 0; vertical-align: middle;">
+                        <span>I agree to the <a href="#" onclick="openTermsModal(); return false;" class="terms-link-inline">Terms & Conditions</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" name="accept" value="Continue" class="submit-btn" id="submitBtn" disabled>
+                    Connect to Internet
+                </button>
+            </div>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <span class="success-icon">✅</span>
+                <div class="success-title">Connected Successfully!</div>
+                <div class="success-subtitle">Welcome to the Free Wi-Fi Zone</div>
+                <div class="redirect-info">
+                    <span class="spinner"></span>
+                    Redirecting you to the internet...
+                </div>
+            </div>
+        </form>
+
+        <!-- Terms and Conditions Modal -->
+        <div class="modal" id="termsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Terms & Conditions</h2>
+                    <button class="close-btn" onclick="closeTermsModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>Session is limited to <strong>30 minutes</strong> of continuous use</li>
+                        <li>No heavy downloads, video streaming, or large file transfers are permitted</li>
+                        <li>This is a <strong>public network</strong> - avoid accessing sensitive personal information</li>
+                        <li>Misuse or scanning of internal network resources will result in immediate disconnection</li>
+                        <li>Network activity may be monitored for security purposes</li>
+                        <li>Users are responsible for their online activities and must comply with local laws</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Free Wi-Fi • Secure Connection • Limited Time Access</p>
+        </div>
+    </div>
+
+    <script>
+        function openTermsModal() {
+            const modal = document.getElementById('termsModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeTermsModal() {
+            const modal = document.getElementById('termsModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('termsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTermsModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeTermsModal();
+            }
+        });
+
+        function toggleSubmit() {
+            const checkbox = document.getElementById('agree');
+            const submitBtn = document.getElementById('submitBtn');
+            const checkboxGroup = document.getElementById('checkboxGroup');
+            
+            submitBtn.disabled = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                checkboxGroup.classList.add('checked');
+            } else {
+                checkboxGroup.classList.remove('checked');
+            }
+        }
+
+        // Form validation and success handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('auth_user').value.trim();
+            const password = document.getElementById('auth_pass').value.trim();
+            const agreed = document.getElementById('agree').checked;
+            
+            if (!agreed) {
+                e.preventDefault();
+                alert('Please accept the Terms & Conditions to continue.');
+                return;
+            }
+            
+            if (!username && !password) {
+                e.preventDefault();
+                alert('Please enter both username and password.');
+                return;
+            }
+            
+            if ((username && !password) || (!username && password)) {
+                e.preventDefault();
+                alert('Please enter both username and password.');
+                return;
+            }
+
+            // Show success message if form is valid
+            showSuccessMessage();
+        });
+
+        function showSuccessMessage() {
+            const formContainer = document.getElementById('formContainer');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Hide form with animation
+            formContainer.classList.add('hidden');
+            
+            // Show success message after form fades out
+            setTimeout(() => {
+                successMessage.classList.add('show');
+            }, 300);
+        }
+
+        // Check if we're on the success page (pfSense redirects back with success parameter)
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true' || urlParams.get('status') === 'success') {
+                showSuccessMessage();
+            } else {
+                const firstInput = document.getElementById('auth_user');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
