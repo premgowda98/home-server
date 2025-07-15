@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guest WiFi</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .submit-btn {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .submit-btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    .success-message {
+      display: none;
+      background: #e6ffed;
+      border: 2px solid #28a745;
+      padding: 20px;
+      border-radius: 10px;
+      color: #155724;
+      margin-top: 20px;
+    }
+    .success-message.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Guest WiFi Login</h1>
+
+    <form id="loginForm" method="POST" action="$PORTAL_ACTION$">
+      <!-- Hidden pfSense fields -->
+      <input type="hidden" name="redirurl" value="$PORTAL_REDIRURL$" id="redirurl" />
+      <input type="hidden" name="zone" value="$PORTAL_ZONE$" />
+
+      <div class="form-group">
+        <label for="auth_user">Username</label>
+        <input type="text" name="auth_user" id="auth_user" required />
+      </div>
+
+      <div class="form-group">
+        <label for="auth_pass">Password</label>
+        <input type="password" name="auth_pass" id="auth_pass" required />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="agree" onchange="toggleSubmit()" />
+          I agree to the Terms & Conditions
+        </label>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>Connect</button>
+
+      <div class="success-message" id="successMessage">
+        ✅ Login successful! Redirecting...
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function toggleSubmit() {
+      const checkbox = document.getElementById('agree');
+      const button = document.getElementById('submitBtn');
+      button.disabled = !checkbox.checked;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Stop default submit
+
+      const username = document.getElementById('auth_user').value.trim();
+      const password = document.getElementById('auth_pass').value.trim();
+      const agreed = document.getElementById('agree').checked;
+
+      if (!username || !password || !agreed) {
+        alert('Please complete all fields and agree to terms.');
+        return;
+      }
+
+      // Simulate submission (pfSense will process form in backend)
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      })
+      .then(res => {
+        if (res.ok) {
+          document.getElementById('successMessage').classList.add('show');
+
+          const redir = document.getElementById('redirurl').value || 'http://example.com';
+          setTimeout(() => {
+            window.location.href = redir;
+          }, 3000);
+        } else {
+          alert('Login failed. Please try again.');
+        }
+      })
+      .catch(() => {
+        alert('Connection error. Please try again.');
+      });
+    });
+  </script>
+</body>
+</html>
