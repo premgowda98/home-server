@@ -13,6 +13,7 @@
    1. `wg genkey | tee privatekey | wg pubkey > publickey`
 8. Disable the block private address rule in WAN interface.
 
+/etc/wiregaurd/wg0.conf
 ```bash                                                                      
 [Interface]
 PrivateKey=2A2jdI6DMHKUzO7dip5EJpBrEXVmA1dTYpzOrf4ZjEI=

@@ -1,0 +1,95 @@
+## Frigate
+
+```bash
+version: 0.15-1
+
+mqtt:
+  enabled: false
+
+detectors:
+  ov:
+    type: openvino
+    device: CPU
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+objects:
+  track:
+    - person
+    - car
+    - motorcycle
+
+review:
+  alerts:
+    labels:
+      - car
+      - person
+      - speech
+
+audio:
+  enabled: True
+  listen:
+    - bark
+    - speech
+    - crying
+
+camera_groups:
+  Home_Security:
+    order: 1
+    icon: LuHome
+    cameras: tapo_c500
+
+go2rtc:
+  streams:
+    tapo_c500:
+      - rtsp://premgowda:gowda1598@192.168.0.202:554/stream1
+      - ffmpeg:tapo_c500#audio=opus
+  webrtc:
+    candidates:
+      - 192.168.0.116:8555
+      - stun:8555
+
+cameras:
+  tapo_c500:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/tapo_c500
+          roles:
+            - detect
+            - record
+            - audio
+      output_args: 
+        record: preset-record-generic-audio-copy
+    audio:
+      enabled: true
+    detect:
+      enabled: true
+      width: 1280
+      height: 720
+      fps: 5
+    onvif:
+      host: 192.168.0.202
+      port: 2020
+      user: premgowda
+      password: gowda1598
+    record:
+      enabled: true
+      retain:
+        days: 3
+        mode: motion
+      alerts:
+        retain:
+          days: 30
+          mode: motion
+      detections:
+        retain:
+          days: 30
+          mode: motion
+```
