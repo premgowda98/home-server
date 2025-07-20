@@ -49,7 +49,7 @@ go2rtc:
   streams:
     tapo_c500:
       - rtsp://premgowda:gowda1598@192.168.0.202:554/stream1
-      - ffmpeg:tapo_c500#audio=opus
+      - ffmpeg:rtsp://premgowda:gowda1598@192.168.0.202:554/stream1#audio=aac#video=copy
   webrtc:
     candidates:
       - 192.168.0.116:8555
@@ -65,8 +65,6 @@ cameras:
             - detect
             - record
             - audio
-      output_args: 
-        record: preset-record-generic-audio-copy
     audio:
       enabled: true
     detect:
