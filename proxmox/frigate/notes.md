@@ -65,6 +65,8 @@ cameras:
             - detect
             - record
             - audio
+        output_args:
+          record: preset-record-generic-audio-copy
     audio:
       enabled: true
     detect:
