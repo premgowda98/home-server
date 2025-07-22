@@ -1,0 +1,27 @@
+[Unit]
+Description=Internet Connectivity Monitor
+Documentation=man:ping(8)
+After=network-online.target
+Wants=network-online.target
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/bin/bash /root/internet-monitor/internet-monitor.sh start
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+TimeoutStopSec=30
+WorkingDirectory=/root/internet-monitor
+
+# Minimal security settings for system monitoring script
+NoNewPrivileges=no
+PrivateTmp=no
+ProtectHome=no
+
+[Install]
+WantedBy=multi-user.target
